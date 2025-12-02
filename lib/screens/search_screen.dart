@@ -12,6 +12,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _fromController = TextEditingController(text: 'Bengaluru, Karnataka');
   final _toController = TextEditingController(text: 'Chennai, Tamil Nadu');
 
@@ -41,6 +42,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _selectLocation(BuildContext context, TextEditingController controller,
       String label) async {
+    // This navigation is a placeholder. In a real app, you'd update the controller.
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -103,73 +105,64 @@ class _SearchScreenState extends State<SearchScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildLocationField(
-                                controller: _fromController,
-                                icon: Icons.radio_button_checked,
-                                label: 'Leaving from',
-                              ),
-                              const Divider(height: 1),
-                              _buildLocationField(
-                                controller: _toController,
-                                icon: Icons.place,
-                                label: 'Going to',
-                              ),
-                              const Divider(height: 1),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _buildInfoRow(
-                                      icon: Icons.calendar_today,
-                                      text: DateFormat('EEE, d MMM')
-                                          .format(_selectedDate),
-                                      onTap: () => _selectDate(context),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                      height: 32, child: VerticalDivider()),
-                                  Expanded(
-                                    child: _buildPassengerCounter(),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    // Navigate to search results
-                                    if (_fromController.text.isNotEmpty &&
-                                        _toController.text.isNotEmpty) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => SearchResultsScreen(
-                                            from: _fromController.text,
-                                            to: _toController.text,
-                                            // date: _selectedDate,
-                                            // passengers: _passengerCount,
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please select both locations.'),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: const Text('Search'),
+                        child: Form(
+                          key: _formKey,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildLocationFormField(
+                                  controller: _fromController,
+                                  icon: Icons.radio_button_checked,
+                                  label: 'Leaving from',
                                 ),
-                              )
-                            ],
+                                const Divider(height: 1),
+                                _buildLocationFormField(
+                                  controller: _toController,
+                                  icon: Icons.place,
+                                  label: 'Going to',
+                                ),
+                                const Divider(height: 1),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildInfoRow(
+                                        icon: Icons.calendar_today,
+                                        text: DateFormat('EEE, d MMM')
+                                            .format(_selectedDate),
+                                        onTap: () => _selectDate(context),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                        height: 32, child: VerticalDivider()),
+                                    Expanded(
+                                      child: _buildPassengerCounter(),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => SearchResultsScreen(
+                                              from: _fromController.text,
+                                              to: _toController.text,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: const Text('Search'),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -219,7 +212,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildLocationField({
+  Widget _buildLocationFormField({
     required TextEditingController controller,
     required IconData icon,
     required String label,
@@ -227,7 +220,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return InkWell(
       onTap: () => _selectLocation(context, controller, label),
       child: IgnorePointer(
-        child: TextField(
+        child: TextFormField(
           controller: controller,
           decoration: InputDecoration(
             prefixIcon:
@@ -236,6 +229,12 @@ class _SearchScreenState extends State<SearchScreen> {
             border: InputBorder.none,
           ),
           style: const TextStyle(fontWeight: FontWeight.w500),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please select a location';
+            }
+            return null;
+          },
         ),
       ),
     );

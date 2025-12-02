@@ -24,27 +24,23 @@ class RideShareXApp extends StatelessWidget {
         title: 'RideShareX',
         theme: ThemeData(
           useMaterial3: true,
+          // Let Material 3 generate a harmonious color scheme from a single seed color.
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF00AEEF),
-            primary: const Color(0xFF00AEEF),
-            secondary: Colors.teal,
             brightness: Brightness.light,
           ),
-          scaffoldBackgroundColor: Colors.white,
           cardTheme: CardThemeData(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
             ),
-            elevation: 2,
+            clipBehavior: Clip.antiAlias,
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF00AEEF),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
-              foregroundColor: Colors.white,
-              minimumSize: const Size.fromHeight(48),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
           ),
         ),
